@@ -36,6 +36,6 @@ public interface IVirtualSensor {
 	 * @param sensor
 	 * @return the read value
 	 */
-	public float readSensor(String sm, String platform, String sensor);
-	
+	public float pushSensor(String sm, String platform, String sensor, float value);
+	public float getSensor(String sm, String platform, String sensor);
 }

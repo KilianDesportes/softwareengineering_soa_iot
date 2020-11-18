@@ -6,6 +6,7 @@ import org.eclipse.om2m.commons.resource.ContentInstance;
 import org.eclipse.om2m.commons.resource.SemanticDescriptor;
 
 import fr.laas.mooc.helper.http.HTTPPost;
+import fr.laas.mooc.helper.http.HTTPGet;
 import fr.laas.mooc.helper.om2m.ResourceCreator;
 import fr.laas.mooc.helper.om2m.Serializer;
 import fr.laas.mooc.helper.virtual.Platform;
@@ -66,16 +67,9 @@ public class IPE implements IVirtualSensor {
 	}
 
 	@Override
-	public float readSensor(String sm, String platform, String sensor) {
-		float value=0.0f;
-		for(Platform pf : this.sm.getAllPlatforms()){
-			if(pf.getName().equals(platform)){
-				value = pf.getSensor(sensor).readValue();
-			}
-		}
+	public float pushSensor(String sm, String platform, String sensor, float val) {
+		float value=val;
 		HTTPPost request = new HTTPPost();
-		request.setDestinator("http://localhost:8080/~/in-cse/in-name/"+sm+"/"+platform+"/"+sensor);
-		request = new HTTPPost();
 		request.setDestinator("http://localhost:8080/~/in-cse/in-name/"+sm+"/"+platform+"/"+sensor);
 		request.addHeader("X-M2M-Origin", "admin:admin");
 		request.addHeader("Content-Type", "application/xml;ty=4");
@@ -83,6 +77,20 @@ public class IPE implements IVirtualSensor {
 		cin.setContent(String.valueOf(value));
 		request.setBody(Serializer.toXML(cin));
 		request.send();
+		return value;
+	}
+	public float getSensor(String sm, String platform, String sensor)
+	{
+		float value=3.0f;
+		HTTPGet request = new HTTPGet();
+		request.setDestinator("http://localhost:8080/~/in-cse/in-name/"+sm+"/"+platform+"/"+sensor+"/la");
+		request.addHeader("X-M2M-Origin", "admin:admin");
+		request.addHeader("Content-Type", "application/xml;ty=4");
+		String requestSended = request.send();
+		System.out.println("string rendu par send():");
+		System.out.println(requestSended);
+		String strValue =requestSended.split("con")[1].replace(">","").replace("</","");
+		value = Float.parseFloat(strValue);
 		return value;
 	}
 	

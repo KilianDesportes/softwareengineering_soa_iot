@@ -15,21 +15,16 @@ public class ControlerSensor {
 	@GetMapping("/setupsensors")
 	public String setUpsensors() {
 		IPE ipe = new IPE();
-		SensorManager sm = ipe.createSensorManager("TemperatureSensor");
-		ipe.createPlatform(sm.getId(), new Platform("Home_Test", T_Room.BEDROOM));
-		ipe.addSensor(sm.getId(), "Home_Test", new TemperatureSensor("chambreTest", T_Room.BEDROOM));
-		
-		System.out.println("Number of platforms : "+sm.getAllPlatforms().size());
-		for(Platform p : sm.getAllPlatforms()){
-			System.out.println("Pour "+p.getName()+" : "+p.getAllSensor().size()+" sensors");
-		}
-		
+		SensorManager sm = ipe.createSensorManager("SensorManager");
+		ipe.createPlatform(sm.getId(), new Platform("Room_Platform", T_Room.BEDROOM));
+		ipe.addSensor(sm.getId(), "Room_Platform", new TemperatureSensor("TemperatureSensorIn", T_Room.BEDROOM));
+		ipe.addSensor(sm.getId(), "Room_Platform", new TemperatureSensor("TemperatureSensorOut", T_Room.BEDROOM));
+		ipe.addSensor(sm.getId(), "Room_Platform", new TemperatureSensor("DoorSensor", T_Room.BEDROOM));
+		ipe.addSensor(sm.getId(), "Room_Platform", new TemperatureSensor("WindowSensor", T_Room.BEDROOM));
+		ipe.addSensor(sm.getId(), "Room_Platform", new TemperatureSensor("MovementSensor", T_Room.BEDROOM));
 		return "sensors succeffuly set";
 	}
 	
-	@GetMapping("/students")
-	public int studentNumber() {
-		return 200;
-	}
+	
 	
 }
