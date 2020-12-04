@@ -67,31 +67,31 @@ public class IPE implements IVirtualSensor {
 	}
 
 	@Override
-	public float pushSensor(String sm, String platform, String sensor, float val) {
-		float value=val;
+	public String pushSensor(String sm, String platform, String sensor, String val) {
+		
 		HTTPPost request = new HTTPPost();
 		request.setDestinator("http://localhost:8080/~/in-cse/in-name/"+sm+"/"+platform+"/"+sensor);
 		request.addHeader("X-M2M-Origin", "admin:admin");
 		request.addHeader("Content-Type", "application/xml;ty=4");
 		ContentInstance cin = new ContentInstance();
-		cin.setContent(String.valueOf(value));
+		cin.setContent(val);
 		request.setBody(Serializer.toXML(cin));
 		request.send();
-		return value;
+		return val;
 	}
-	public float getSensor(String sm, String platform, String sensor)
+	public String getSensor(String sm, String platform, String sensor)
 	{
-		float value=3.0f;
+		
 		HTTPGet request = new HTTPGet();
 		request.setDestinator("http://localhost:8080/~/in-cse/in-name/"+sm+"/"+platform+"/"+sensor+"/la");
 		request.addHeader("X-M2M-Origin", "admin:admin");
 		request.addHeader("Content-Type", "application/xml;ty=4");
 		String requestSended = request.send();
-		System.out.println("string rendu par send():");
-		System.out.println(requestSended);
+		//System.out.println("string rendu par send():");
+		//System.out.println(requestSended);
 		String strValue =requestSended.split("con")[1].replace(">","").replace("</","");
-		value = Float.parseFloat(strValue);
-		return value;
+		
+		return strValue;
 	}
 	
 }
