@@ -4,150 +4,142 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.web.client.RestTemplate;
 
 @SpringBootTest
 class ProjectApplicationTests {
 
+	RestTemplate restTemplate = new RestTemplate();
+	String localURL = "http://localhost:8081/";
+	
 	@Test
-	void contextLoads() {
-		
+	void testSetTemperatureSensorIn() throws InterruptedException {
+		restTemplate.getForObject(localURL+"TemperatureSensorIn/15", String.class);
+		String TemperatureSensorIn = restTemplate.getForObject(localURL+"TemperatureSensorIn", String.class);
+		Thread.sleep(1000);
+		assertTrue(TemperatureSensorIn.equals("15"),"TemperatureSensorIn is not properly set");
 	}
 	
 	@Test
-	void testTemperatureOut() {
-		IPE ipe = new IPE();
-		ProjectApplication app = new ProjectApplication();
-		
-		Float tptOut = 19.0f;
-		
-		ipe.pushSensor("SensorManager", "Room_Platform", "TemperatureSensorOut", String.valueOf(tptOut));
-
-		String valueTemperatureSensorOut = ipe.getSensor("SensorManager","Room_Platform","TemperatureSensorOut");
-		assertTrue(valueTemperatureSensorOut.compareTo(tptOut.toString())==0, "Innacurate temperature");
-
-		boolean valueWindow = app.window();
-		assertTrue(valueWindow	==	true, "Innacurate window state");
-		
-		tptOut = 30.0f;
-		
-		ipe.pushSensor("SensorManager", "Room_Platform", "TemperatureSensorOut", String.valueOf(tptOut));
-		
-		valueTemperatureSensorOut = ipe.getSensor("SensorManager","Room_Platform","TemperatureSensorOut");
-		assertTrue(valueTemperatureSensorOut.compareTo(tptOut.toString())==0, "Innacurate temperature");
-
-		valueWindow = app.window();
-		assertTrue(valueWindow	==	false, "Innacurate window state");
+	void testSetTemperatureSensorOut() throws InterruptedException {
+		restTemplate.getForObject(localURL+"TemperatureSensorOut/25", String.class);
+		String TemperatureSensorOut = restTemplate.getForObject(localURL+"TemperatureSensorOut", String.class);
+		Thread.sleep(1000);
+		assertTrue(TemperatureSensorOut.equals("25"),"TemperatureSensorOut is not properly set");
 	}
 	
 	@Test
-	void testTemperatureIn() {
-		IPE ipe = new IPE();
-		ProjectApplication app = new ProjectApplication();
-		
-		Float tptOut = 17.0f;
-		
-		ipe.pushSensor("SensorManager", "Room_Platform", "TemperatureSensorIn", String.valueOf(tptOut));
-
-		String valueTemperatureSensorOut = ipe.getSensor("SensorManager","Room_Platform","TemperatureSensorIn");
-		assertTrue(valueTemperatureSensorOut.compareTo(tptOut.toString())==0, "Innacurate temperature");
-
-		boolean valueHeater = app.heat();
-		assertTrue(valueHeater	==	false, "Innacurate heater state");
-		
-		tptOut = 10.0f;
-		
-		ipe.pushSensor("SensorManager", "Room_Platform", "TemperatureSensorOut", String.valueOf(tptOut));
-		
-		valueTemperatureSensorOut = ipe.getSensor("SensorManager","Room_Platform","TemperatureSensorOut");
-		assertTrue(valueTemperatureSensorOut.compareTo(tptOut.toString())==0, "Innacurate temperature");
-
-		valueHeater = app.heat();
-		assertTrue(valueHeater	==	false, "Innacurate heater state");
-		
+	void testSetMovementSensor() throws InterruptedException {
+		restTemplate.getForObject(localURL+"MovementSensor/1", String.class);
+		String MovementSensor = restTemplate.getForObject(localURL+"MovementSensor", String.class);
+		Thread.sleep(1000);
+		assertTrue(MovementSensor.equals("1"),"MovementSensor is not properly set");
 	}
 	
 	@Test
-	void testPresenceHour() {
-		IPE ipe = new IPE();
-		ProjectApplication app = new ProjectApplication();
-		
-		app.setHourTestMode(true,10);
-		int presence = 0;
-		
-		ipe.pushSensor("SensorManager", "Room_Platform", "MovementSensor", String.valueOf(presence));
-		int valuePresence = Integer.parseInt(ipe.getSensor("SensorManager","Room_Platform", "MovementSensor"));
-
-		boolean valueWindow = app.window();
-		boolean valueDoor = app.door();
-		boolean valueLight = app.lights();
-
-		assertTrue(valuePresence == presence, "Innacurate presence value");
-		assertTrue(valueWindow	==	true, "Innacurate window state");
-		assertTrue(valueDoor	==	true, "Innacurate door state");
-		assertTrue(valueLight	==	true, "Innacurate light state");
-		
-		app.setHourTestMode(true,20);
-		
-		valueWindow = app.window();
-		valueDoor = app.door();
-		valueLight = app.lights();
-
-		assertTrue(valuePresence == presence, "Innacurate presence value");
-		assertTrue(valueWindow	==	false, "Innacurate window state");
-		assertTrue(valueDoor	==	false, "Innacurate door state");
-		assertTrue(valueLight	==	false, "Innacurate light state");
-		
-		presence = 1;
-		
-		ipe.pushSensor("SensorManager", "Room_Platform", "MovementSensor", String.valueOf(presence));
-		valuePresence = Integer.parseInt(ipe.getSensor("SensorManager","Room_Platform", "MovementSensor"));
-
-		valueWindow = app.window();
-		valueDoor = app.door();
-		valueLight = app.lights();
-
-		assertTrue(valuePresence == presence, "Innacurate presence value");
-		assertTrue(valueWindow	==	true, "Innacurate window state");
-		assertTrue(valueDoor	==	true, "Innacurate door state");
-		assertTrue(valueLight	==	true, "Innacurate light state");
-		
-		app.setHourTestMode(false,0);
+	void testSetHourSensor() throws InterruptedException {
+		restTemplate.getForObject(localURL+"HourSensor/10", String.class);
+		String HourSensor = restTemplate.getForObject(localURL+"HourSensor", String.class);
+		Thread.sleep(1000);
+		assertTrue(HourSensor.equals("10"),"HourSensor is not properly set");
 	}
 	
 	@Test
-	void testAlarm() {
-		IPE ipe = new IPE();
-		ProjectApplication app = new ProjectApplication();
+	void testHeater() throws InterruptedException {
+		restTemplate.getForObject(localURL + "TemperatureSensorIn/10", String.class);
+		String heater = restTemplate.getForObject(localURL+"Heater", String.class);
+		Thread.sleep(1000);
+		assertTrue(heater.equals("true"),"Heater not ON with low temperatureIn");
 		
-		app.setHourTestMode(true,20);
-		int presence = 1;
+		restTemplate.getForObject(localURL + "TemperatureSensorIn/20", String.class);
+		heater = restTemplate.getForObject(localURL+"Heater", String.class);
+		Thread.sleep(1000);
+		assertTrue(heater.equals("false"),"Heater not OFF with high temperatureIn");
+	}
+	
+	@Test
+	void testLight() throws InterruptedException {
+		restTemplate.getForObject(localURL + "MovementSensor/1", String.class);
+		restTemplate.getForObject(localURL + "HourSensor/15", String.class);
+		String light = restTemplate.getForObject(localURL+"Light", String.class);
+		Thread.sleep(1000);
+		assertTrue(light.equals("true"),"Light not ON with movement and good hours");
 		
-		ipe.pushSensor("SensorManager", "Room_Platform", "MovementSensor", String.valueOf(presence));
-		int valuePresence = Integer.parseInt(ipe.getSensor("SensorManager","Room_Platform", "MovementSensor"));
-
-		boolean valueAlarm = app.alarm();
-				
-		assertTrue(valuePresence == presence, "Innacurate presence value");
-		assertTrue(valueAlarm	==	true, "Innacurate window state");
+		restTemplate.getForObject(localURL + "MovementSensor/1", String.class);
+		restTemplate.getForObject(localURL + "HourSensor/20", String.class);
+		light = restTemplate.getForObject(localURL+"Light", String.class);
+		Thread.sleep(1000);
+		assertTrue(light.equals("false"),"Light not OFF with movement and bad hours");
 		
-		app.setHourTestMode(true,10);
-		valueAlarm = app.alarm();
+		restTemplate.getForObject(localURL + "MovementSensor/0", String.class);
+		restTemplate.getForObject(localURL + "HourSensor/15", String.class);
+		light = restTemplate.getForObject(localURL+"Light", String.class);
+		Thread.sleep(1000);
+		assertTrue(light.equals("false"),"Light not OFF with no movement and good hours");
 		
-		assertTrue(valuePresence == presence, "Innacurate presence value");
-		assertTrue(valueAlarm	==	false, "Innacurate window state");
+		restTemplate.getForObject(localURL + "MovementSensor/0", String.class);
+		restTemplate.getForObject(localURL + "HourSensor/20", String.class);
+		light = restTemplate.getForObject(localURL+"Light", String.class);
+		Thread.sleep(1000);
+		assertTrue(light.equals("false"),"Light not OFF with no movement and bad hours");
+	}
+	
+	@Test
+	void testAlarm() throws InterruptedException {
+		restTemplate.getForObject(localURL + "MovementSensor/1", String.class);
+		restTemplate.getForObject(localURL + "HourSensor/15", String.class);
+		String alarm = restTemplate.getForObject(localURL+"Alarm", String.class);
+		Thread.sleep(1000);
+		assertTrue(alarm.equals("false"),"Alarm not OFF with movement and good hours");
 		
-		presence = 0;
-		app.setHourTestMode(true,20);
-
-		ipe.pushSensor("SensorManager", "Room_Platform", "MovementSensor", String.valueOf(presence));
-		valuePresence = Integer.parseInt(ipe.getSensor("SensorManager","Room_Platform", "MovementSensor"));
-
-		valueAlarm = app.alarm();
-				
-		assertTrue(valuePresence == presence, "Innacurate presence value");
-		assertTrue(valueAlarm	==	false, "Innacurate window state");
+		restTemplate.getForObject(localURL + "MovementSensor/1", String.class);
+		restTemplate.getForObject(localURL + "HourSensor/20", String.class);
+		alarm = restTemplate.getForObject(localURL+"Alarm", String.class);
+		Thread.sleep(1000);
+		assertTrue(alarm.equals("true"),"Alarm not ON with movement and bad hours");
 		
-		app.setHourTestMode(false,0);
+		restTemplate.getForObject(localURL + "MovementSensor/0", String.class);
+		restTemplate.getForObject(localURL + "HourSensor/15", String.class);
+		alarm = restTemplate.getForObject(localURL+"Alarm", String.class);
+		Thread.sleep(1000);
+		assertTrue(alarm.equals("false"),"Alarm not OFF with no movement and good hours");
+		
+		restTemplate.getForObject(localURL + "MovementSensor/0", String.class);
+		restTemplate.getForObject(localURL + "HourSensor/20", String.class);
+		alarm = restTemplate.getForObject(localURL+"Alarm", String.class);
+		Thread.sleep(1000);
+		assertTrue(alarm.equals("false"),"Alarm not OFF with no movement and bad hours");
+	}
+	
+	@Test
+	void testWindow() throws InterruptedException {
+		restTemplate.getForObject(localURL + "TemperatureSensorOut/10", String.class);
+		String window = restTemplate.getForObject(localURL+"Window", String.class);
+		Thread.sleep(1000);
+		assertTrue(window.equals("false"),"Window not OFF with low temperatureIn");
+		
+		restTemplate.getForObject(localURL + "TemperatureSensorOut/20", String.class);
+		window = restTemplate.getForObject(localURL+"Window", String.class);
+		Thread.sleep(1000);
+		assertTrue(window.equals("true"),"Window not OFF with good temperatureIn");
+		
+		restTemplate.getForObject(localURL + "TemperatureSensorOut/30", String.class);
+		window = restTemplate.getForObject(localURL+"Window", String.class);
+		Thread.sleep(1000);
+		assertTrue(window.equals("false"),"Window not OFF with high temperatureIn");
+	}
+	
+	@Test
+	void testDoor() throws InterruptedException {
+		restTemplate.getForObject(localURL + "HourSensor/10", String.class);
+		String door = restTemplate.getForObject(localURL+"Door", String.class);
+		Thread.sleep(1000);
+		assertTrue(door.equals("true"),"Door not ON with good hour");
+		
+		restTemplate.getForObject(localURL + "HourSensor/20", String.class);
+		door = restTemplate.getForObject(localURL+"Door", String.class);
+		Thread.sleep(1000);
+		assertTrue(door.equals("false"),"Door not OFF with bad hour");
 	}
 	
 }
