@@ -15,8 +15,11 @@ public class ControlerSensor {
 	@GetMapping("/setupsensors")
 	public String setUpsensors() {
 		IPE ipe = new IPE();
+		
 		SensorManager sm = ipe.createSensorManager("SensorManager");
+		
 		ipe.createPlatform(sm.getId(), new Platform("Room_Platform", T_Room.BEDROOM));
+		
 		ipe.addSensor(sm.getId(), "Room_Platform", new TemperatureSensor("TemperatureSensorIn", T_Room.BEDROOM));
 		ipe.addSensor(sm.getId(), "Room_Platform", new TemperatureSensor("TemperatureSensorOut", T_Room.BEDROOM));
 		ipe.addSensor(sm.getId(), "Room_Platform", new TemperatureSensor("DoorSensor", T_Room.BEDROOM));

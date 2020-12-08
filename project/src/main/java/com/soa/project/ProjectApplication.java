@@ -1,19 +1,12 @@
 package com.soa.project;
-import fr.laas.mooc.helper.virtual.Platform;
 
 import fr.laas.mooc.helper.virtual.SensorManager;
-import fr.laas.mooc.helper.virtual.T_Room;
-import fr.laas.mooc.helper.virtual.TemperatureSensor;
 
-import org.eclipse.om2m.commons.resource.AE;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import fr.laas.mooc.helper.http.HTTPPost;
-import fr.laas.mooc.helper.om2m.ResourceCreator;
-import fr.laas.mooc.helper.om2m.Serializer;
 
 import java.time.format.DateTimeFormatter;  
 import java.time.LocalDateTime;
@@ -21,80 +14,149 @@ import java.time.LocalDateTime;
 @SpringBootApplication
 @RestController
 public class ProjectApplication {
-	protected static float temperature ; 
+	protected static float temperatureIn ; 
+	protected static float temperatureOut ; 
 	protected static int presence=0;
-	protected static boolean closedFenetre = false;
-	protected static boolean closedDoor = false;
+	protected static boolean window = false;
+	protected static boolean door = false;
+	protected static boolean lights = false;
+	protected static boolean alarm = false;
+	protected static boolean heat = false;
+	protected static int givenTemperature = 15;
+	
+	protected static boolean testHourMode = false;
+	protected static int testHour;
+	
 	public static void main(String[] args) {
 		SpringApplication.run(ProjectApplication.class, args);
 		IPE ipe = new IPE();
-		SensorManager sm = ipe.createSensorManager("SensorManager");
 		
-		//float value = ipe.PushSensor(sm.getId(), "Room_Platform", "TemperatureSensor",19.0f);
-		//System.out.println(value);
-		float maxValue = 18.0f;
 		ipe.pushSensor("SensorManager", "Room_Platform", "MovementSensor", String.valueOf(0));
+		
 		while(true)
 		{
-			float valueFentre =Float.parseFloat(ipe.getSensor("SensorManager","Room_Platform","TemperatureSensor"));
-			temperature = valueFentre;
+			float valueTemperatureIn =Float.parseFloat(ipe.getSensor("SensorManager","Room_Platform","TemperatureSensorIn"));
+			temperatureIn = valueTemperatureIn;
+			
+			float valueTemperatureOut =Float.parseFloat(ipe.getSensor("SensorManager","Room_Platform","TemperatureSensorOut"));
+			temperatureOut = valueTemperatureOut;
+			
 			//System.out.println(temperature);
-			if(temperature < 27.0f && temperature>18.0f)
+			if(temperatureOut < 27.0f && temperatureOut>18.0f)
 			{
-				closedFenetre=false;
-				ipe.pushSensor("SensorManager", "Room_Platform", "WindowSensor", String.valueOf(closedFenetre));
+				window=true;
+				ipe.pushSensor("SensorManager", "Room_Platform", "WindowSensor", String.valueOf(window));
 			}
 			else
 			{
-				closedFenetre=true;
-				ipe.pushSensor("SensorManager", "Room_Platform", "WindowSensor", String.valueOf(closedFenetre));
+				window=false;
+				ipe.pushSensor("SensorManager", "Room_Platform", "WindowSensor", String.valueOf(window));
 			}
 			int valuePresence = Integer.parseInt(ipe.getSensor("SensorManager","Room_Platform", "MovementSensor"));
-			int time =  GetCurrentTime();
+			
+			int time = getHour();
+			
 			if((valuePresence == 0) && ( (time >= 18) || (time < 8) ))
 			{
-				closedDoor = true;
-				ipe.pushSensor("SensorManager", "Room_Platform", "DoorSensor", String.valueOf(closedDoor));
-				closedFenetre = true;
-				ipe.pushSensor("SensorManager", "Room_Platform", "WindowSensor", String.valueOf(closedFenetre));
+				door = false;
+				ipe.pushSensor("SensorManager", "Room_Platform", "DoorSensor", String.valueOf(door));
+				window = false;
+				ipe.pushSensor("SensorManager", "Room_Platform", "WindowSensor", String.valueOf(window));
+				lights =false;
 				
 			}
 			else
 			{
-				closedDoor = false;
-				ipe.pushSensor("SensorManager", "Room_Platform", "DoorSensor", String.valueOf(closedDoor));
-				closedFenetre = false;
-				ipe.pushSensor("SensorManager", "Room_Platform", "WindowSensor", String.valueOf(closedFenetre));
+				door = true;
+				ipe.pushSensor("SensorManager", "Room_Platform", "DoorSensor", String.valueOf(door));
+				window = true;
+				ipe.pushSensor("SensorManager", "Room_Platform", "WindowSensor", String.valueOf(window));
+				lights =true;
+			}
+			
+			if((valuePresence == 1) && ( (time >= 18) || (time < 8) ))
+			{
+				alarm=false;
+			}
+			else
+			{
+				alarm=true;
+			}
+			
+			if(temperatureIn < givenTemperature)
+			{
+				heat=true;
+			}
+			else
+			{
+				heat=false;
 			}
 				
 			
 		}
 	}
 	
-	
-	@GetMapping("/temperature")
-	public float GetTemperature() {
-	
-		return this.temperature;
+	public void setHourTestMode(boolean testMode, int hour) {
+		testHourMode = testMode;
+		testHour = hour;
 	}
 	
-	public void SetTemperature(float temp)
-	{
-		this.temperature = temp;
+	public static int getHour() {
+		if(testHourMode) {
+			return testHour;
+		}else {
+			return GetCurrentTime();
+		}
 	}
 	
-	@GetMapping("/fenetre")
-	public boolean fenetre()
+	@GetMapping("/temperatureIn")
+	public float GetTemperatureIn() {
+	
+		return temperatureIn;
+	}
+	
+	public void SetTemperatureIn(float temp)
 	{
-		return this.closedFenetre;
+		temperatureIn = temp;
+	}
+	
+	@GetMapping("/temperatureOut")
+	public float GetTemperatureOut() {
+	
+		return temperatureOut;
+	}
+	
+	public void SetTemperatureOut(float temp)
+	{
+		temperatureOut = temp;
+	}
+	
+	@GetMapping("/windows")
+	public boolean window()
+	{
+		return window;
 	}
 	@GetMapping("/door")
 	public boolean door()
 	{
-		return this.closedDoor;
+		return door;
 	}
 	
-	
+	@GetMapping("/lights")
+	public boolean lights()
+	{
+		return lights;
+	}
+	@GetMapping("/heat")
+	public boolean heat()
+	{
+		return heat;
+	}
+	@GetMapping("/alarm")
+	public boolean alarm()
+	{
+		return alarm;
+	}
 	private static int GetCurrentTime()
 	{
 		 DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH");  
